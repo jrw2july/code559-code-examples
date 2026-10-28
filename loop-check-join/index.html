@@ -106,17 +106,17 @@ ul.out li {
   font-family: var(--font-mono); font-size: 0.95rem; background: var(--code-bg); border-left: 3px solid var(--accent);
   border-radius: 0 6px 6px 0; padding: 6px 10px;
 }
-ul.out.tag-list li { animation: pop 0.3s ease both; }
-ul.out.tag-list li:nth-child(1) { animation-delay: 0s; }
-ul.out.tag-list li:nth-child(2) { animation-delay: 0.4s; }
-ul.out.tag-list li:nth-child(3) { animation-delay: 0.8s; }
-ul.out.tag-list li:nth-child(4) { animation-delay: 1.2s; }
-ul.out.tag-list li:nth-child(5) { animation-delay: 1.6s; }
-ul.out.tag-list li:nth-child(6) { animation-delay: 2.0s; }
-ul.out.tag-list li:nth-child(7) { animation-delay: 2.4s; }
-ul.out.tag-list li:nth-child(8) { animation-delay: 2.8s; }
+ul.out.name-list li { animation: pop 0.3s ease both; }
+ul.out.name-list li:nth-child(1) { animation-delay: 0s; }
+ul.out.name-list li:nth-child(2) { animation-delay: 0.4s; }
+ul.out.name-list li:nth-child(3) { animation-delay: 0.8s; }
+ul.out.name-list li:nth-child(4) { animation-delay: 1.2s; }
+ul.out.name-list li:nth-child(5) { animation-delay: 1.6s; }
+ul.out.name-list li:nth-child(6) { animation-delay: 2.0s; }
+ul.out.name-list li:nth-child(7) { animation-delay: 2.4s; }
+ul.out.name-list li:nth-child(8) { animation-delay: 2.8s; }
 @keyframes pop { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { ul.out.tag-list li { animation: none; } }
+@media (prefers-reduced-motion: reduce) { ul.out.name-list li { animation: none; } }
 .status { font-size: 0.9rem; color: var(--fg); font-weight: 600; min-height: 1.4em; }
 .tip { border-top: 1px solid var(--line); padding-top: 14px; color: var(--muted); font-size: 0.9rem; max-width: 70ch; }
 </style>
@@ -124,17 +124,17 @@ ul.out.tag-list li:nth-child(8) { animation-delay: 2.8s; }
 <body>
 <div class="page">
   <header class="stack">
-    <p class="eyebrow">Lesson 21C · working session</p>
+    <p class="eyebrow">Lesson 21C · working model</p>
     <h1>Loop, Check, Join</h1>
     <p class="lede">Three tools for one array. Press the buttons, read the code next to each result, then change the array at the top and press them again.</p>
   </header>
 
   <section class="array-bar">
-    <label for="tags-input">The array every card below uses. Edit it (comma-separated) and everything re-runs.</label>
+    <label for="names-input">The array every card below uses. Edit it (comma-separated) and everything re-runs.</label>
     <div class="array-row">
-      <input type="text" id="tags-input" value="node, forms, fetch, git" size="34" aria-label="Array items, comma separated">
+      <input type="text" id="names-input" value="Alvarez, Chen, Legre, Okafor, Wells" size="40" aria-label="Array items, comma separated">
     </div>
-    <pre id="tags-code" aria-live="polite"></pre>
+    <pre id="names-code" aria-live="polite"></pre>
   </section>
 
   <section class="card" aria-labelledby="h-loop">
@@ -145,7 +145,7 @@ ul.out.tag-list li:nth-child(8) { animation-delay: 2.8s; }
     </div>
     <div class="cols">
       <div class="stack">
-        <span class="label">The loop you wrote in loadFeedback</span>
+        <span class="label">The counting loop, the shape you used in loadFeedback</span>
         <pre id="code-counting"></pre>
         <span class="label">The same loop with for...of</span>
         <pre id="code-forof"></pre>
@@ -156,9 +156,9 @@ ul.out.tag-list li:nth-child(8) { animation-delay: 2.8s; }
           <button type="button" class="primary" id="run-forof">Run for...of</button>
           <button type="button" id="run-empty">Run for...of with []</button>
         </div>
-        <ul class="out tag-list" id="tag-list" aria-live="polite"></ul>
+        <ul class="out name-list" id="name-list" aria-live="polite"></ul>
         <p class="status" id="loop-status" aria-live="polite"></p>
-        <p class="note">Gone: <code>i</code>, <code>tags.length</code>, <code>tags[i]</code>. Still here: <code>createElement</code>, <code>textContent</code>, <code>append</code>. The work is the same; only the counting left.</p>
+        <p class="note">Gone: <code>i</code>, <code>names.length</code>, <code>names[i]</code>. Still here: <code>createElement</code>, <code>textContent</code>, <code>append</code>. The work is the same; only the counting left.</p>
       </div>
     </div>
   </section>
@@ -177,14 +177,15 @@ ul.out.tag-list li:nth-child(8) { animation-delay: 2.8s; }
         <pre id="code-string-includes"></pre>
       </div>
       <div class="stack">
-        <label class="label" for="word-input">Word to look for</label>
+        <label class="label" for="word-input">Name to look for</label>
         <div class="row">
-          <input type="text" id="word-input" value="forms" size="16">
-          <button type="button" data-word="forms">forms</button>
-          <button type="button" data-word="Forms">Forms</button>
-          <button type="button" data-word="form">form</button>
+          <input type="text" id="word-input" value="Legre" size="16">
+          <button type="button" data-word="Legre">Legre</button>
+          <button type="button" data-word="Wells">Wells</button>
+          <button type="button" data-word="Chen">Chen</button>
         </div>
         <div class="result" id="word-result" aria-live="polite"></div>
+        <p class="note">Now type <code>legre</code> with a small l, then <code>Leg</code>. Both say <code>false</code>: the whole item has to match.</p>
         <label class="label" for="url-input">A request.url from your server</label>
         <div class="row">
           <input type="text" id="url-input" value="/feedback?rating=4" size="22">
@@ -250,14 +251,14 @@ ul.out.tag-list li:nth-child(8) { animation-delay: 2.8s; }
     </div>
   </section>
 
-  <p class="tip">Try it in the Console (F12): this page keeps the array in a variable named <code>tags</code>. Type <code>tags.includes("git")</code>, then <code>tags.join(" - ")</code>, then <code>for (const t of tags) console.log(t)</code>.</p>
+  <p class="tip">Try it in the Console (F12): this page keeps the array in a variable named <code>names</code>. Type <code>names.includes("Wells")</code>, then <code>names.join(" - ")</code>, then <code>for (const n of names) console.log(n)</code>.</p>
 </div>
 
 <script>
 // Page elements
-const tagsInput = document.querySelector("#tags-input");
-const tagsCode = document.querySelector("#tags-code");
-const tagList = document.querySelector("#tag-list");
+const namesInput = document.querySelector("#names-input");
+const namesCode = document.querySelector("#names-code");
+const nameList = document.querySelector("#name-list");
 const loopStatus = document.querySelector("#loop-status");
 const wordInput = document.querySelector("#word-input");
 const wordResult = document.querySelector("#word-result");
@@ -272,28 +273,28 @@ const lessonList = document.querySelector("#lesson-list");
 const countLine = document.querySelector("#count-line");
 
 // The array every card uses. Also reachable from the Console.
-let tags = ["node", "forms", "fetch", "git"];
+let names = ["Alvarez", "Chen", "Legre", "Okafor", "Wells"];
 
 // ---- 1. for...of ----------------------------------------------------
-function showEachTagCounting(tags) {
-  for (let i = 0; i < tags.length; i++) {
+function showEachNameCounting(names) {
+  for (let i = 0; i < names.length; i++) {
     const item = document.createElement("li");
-    item.textContent = tags[i];
-    tagList.append(item);
+    item.textContent = names[i];
+    nameList.append(item);
   }
 }
 
-function showEachTag(tags) {
-  for (const tag of tags) {
+function showEachName(names) {
+  for (const name of names) {
     const item = document.createElement("li");
-    item.textContent = tag;
-    tagList.append(item);
+    item.textContent = name;
+    nameList.append(item);
   }
 }
 
 // ---- 2. .includes() ----------------------------------------------------
-function isTagThere(tags, word) {
-  return tags.includes(word);
+function isNameThere(names, word) {
+  return names.includes(word);
 }
 
 function hasCharacters(url, characters) {
@@ -301,8 +302,8 @@ function hasCharacters(url, characters) {
 }
 
 // ---- 3. .join() ----------------------------------------------------
-function glueTags(tags, glue) {
-  return tags.join(glue);
+function glueNames(names, glue) {
+  return names.join(glue);
 }
 
 // ---- 4. all three ----------------------------------------------------
@@ -329,11 +330,11 @@ function showLessons(tag) {
 }
 
 // ---- plumbing: show the code above exactly as it runs ---------------
-document.querySelector("#code-counting").textContent = showEachTagCounting.toString();
-document.querySelector("#code-forof").textContent = showEachTag.toString();
-document.querySelector("#code-includes").textContent = isTagThere.toString();
+document.querySelector("#code-counting").textContent = showEachNameCounting.toString();
+document.querySelector("#code-forof").textContent = showEachName.toString();
+document.querySelector("#code-includes").textContent = isNameThere.toString();
 document.querySelector("#code-string-includes").textContent = hasCharacters.toString();
-document.querySelector("#code-join").textContent = glueTags.toString();
+document.querySelector("#code-join").textContent = glueNames.toString();
 document.querySelector("#code-lessons").textContent = "const lessons = [\n" + lessons.map(function (l) {
   return '  { name: "' + l.name + '", tags: ["' + l.tags.join('", "') + '"] }';
 }).join(",\n") + "\n];";
@@ -360,26 +361,26 @@ function setResult(el, codeText, value) {
   el.append(code, arrow, out);
 }
 
-function readTags() {
-  const parts = tagsInput.value.split(",");
+function readNames() {
+  const parts = namesInput.value.split(",");
   const clean = [];
   for (const part of parts) {
     const word = part.trim();
     if (word !== "") { clean.push(word); }
   }
-  tags = clean;
-  tagsCode.textContent = "const tags = " + arrayText(tags) + ";";
+  names = clean;
+  namesCode.textContent = "const names = " + arrayText(names) + ";";
 }
 
 function runLoop(fn, list) {
-  tagList.textContent = "";
+  nameList.textContent = "";
   fn(list);
-  loopStatus.textContent = "The loop ran " + tagList.children.length + " time" + (tagList.children.length === 1 ? "" : "s") + ".";
+  loopStatus.textContent = "The loop ran " + nameList.children.length + " time" + (nameList.children.length === 1 ? "" : "s") + ".";
 }
 
 function updateIncludes() {
   const word = wordInput.value;
-  setResult(wordResult, "tags.includes(" + quote(word) + ")", isTagThere(tags, word));
+  setResult(wordResult, "names.includes(" + quote(word) + ")", isNameThere(names, word));
   const url = urlInput.value;
   const needle = needleInput.value;
   setResult(urlResult, quote(url) + ".includes(" + quote(needle) + ")", hasCharacters(url, needle));
@@ -387,22 +388,22 @@ function updateIncludes() {
 
 function updateJoin() {
   const glue = glueInput.value;
-  const text = glueTags(tags, glue);
-  setResult(joinResult, "tags.join(" + quote(glue) + ")", text);
+  const text = glueNames(names, glue);
+  setResult(joinResult, "names.join(" + quote(glue) + ")", text);
   joinType.textContent = "A string, " + text.length + " characters long.";
 }
 
 function updateAll() {
-  readTags();
-  runLoop(showEachTag, tags);
+  readNames();
+  runLoop(showEachName, names);
   updateIncludes();
   updateJoin();
 }
 
-tagsInput.addEventListener("input", updateAll);
-document.querySelector("#run-counting").addEventListener("click", function () { runLoop(showEachTagCounting, tags); });
-document.querySelector("#run-forof").addEventListener("click", function () { runLoop(showEachTag, tags); });
-document.querySelector("#run-empty").addEventListener("click", function () { runLoop(showEachTag, []); });
+namesInput.addEventListener("input", updateAll);
+document.querySelector("#run-counting").addEventListener("click", function () { runLoop(showEachNameCounting, names); });
+document.querySelector("#run-forof").addEventListener("click", function () { runLoop(showEachName, names); });
+document.querySelector("#run-empty").addEventListener("click", function () { runLoop(showEachName, []); });
 wordInput.addEventListener("input", updateIncludes);
 urlInput.addEventListener("input", updateIncludes);
 needleInput.addEventListener("input", updateIncludes);
