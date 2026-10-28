@@ -8,6 +8,7 @@ Live site: https://jrw2july.github.io/code559-code-examples/
 
 | Folder | Concept | Used in |
 | --- | --- | --- |
+| `loop-check-join/` | `for...of`, `.includes()`, `.join()`, then all three together in a filter | Lesson 21C working session |
 
 ## How a model is built
 
