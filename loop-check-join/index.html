@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Loop, Check, Join</title>
+  <meta name="description" content="A working model of for...of, .includes() and .join(): press the buttons, read the code next to each result.">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+  <style>
+html { color-scheme: light; }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+  <style>
+/* Layout: one array at the top, then four numbered cards; each card is code on the left, live result on the right, stacking to one column on a phone. */
+:root {
+  --bg: #F2F5F8;
+  --surface: #FFFFFF;
+  --fg: #1B2430;
+  --muted: #5B6875;
+  --line: #D5DDE5;
+  --accent: #1A6E8C;
+  --accent-soft: #DCEBF1;
+  --code-bg: #E9EEF3;
+  --yes: #1F7A4D;
+  --no: #B23A3A;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F161D; --surface: #16212B; --fg: #E6EDF3; --muted: #9AA8B5; --line: #2A3845;
+    --accent: #6CC3E0; --accent-soft: #1E3A47; --code-bg: #1C2733; --yes: #5FCB8E; --no: #F08A8A;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F161D; --surface: #16212B; --fg: #E6EDF3; --muted: #9AA8B5; --line: #2A3845;
+  --accent: #6CC3E0; --accent-soft: #1E3A47; --code-bg: #1C2733; --yes: #5FCB8E; --no: #F08A8A;
+  color-scheme: dark;
+}
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px 48px;
+}
+.page { max-width: 960px; margin: 0 auto; display: grid; gap: 20px; }
+h1 { font-size: 1.75rem; font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+h2 { font-size: 1.1rem; font-weight: 600; margin: 0; }
+p { margin: 0; }
+.lede { color: var(--muted); max-width: 60ch; }
+.eyebrow { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 600; }
+.array-bar {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 8px;
+  padding: 14px 16px; display: grid; gap: 10px;
+}
+.array-bar label { font-size: 0.9rem; color: var(--muted); }
+.array-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+input[type="text"], select {
+  font: inherit; font-family: var(--font-mono); font-size: 0.95rem;
+  color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: 7px 10px; min-width: 0;
+}
+input[type="text"]:focus-visible, select:focus-visible, button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button {
+  font: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  color: var(--accent); background: var(--accent-soft); border: 1px solid transparent; border-radius: 6px;
+  padding: 7px 12px;
+}
+button.primary { color: var(--surface); background: var(--accent); }
+button:hover { border-color: var(--accent); }
+.card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: 10px;
+  padding: 18px; display: grid; gap: 14px;
+}
+.card-head { display: grid; gap: 4px; }
+.card-head .num { font-family: var(--font-mono); color: var(--muted); font-size: 0.85rem; }
+.cols { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.cols > * { min-width: 0; }
+@media (max-width: 680px) { .cols { grid-template-columns: 1fr; } }
+pre {
+  margin: 0; background: var(--code-bg); border-radius: 8px; padding: 12px 14px;
+  font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.5; overflow-x: auto;
+}
+code { font-family: var(--font-mono); font-size: 0.9em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+.stack { display: grid; gap: 10px; align-content: start; }
+.label { font-size: 0.8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
+.result {
+  font-family: var(--font-mono); font-size: 0.95rem; background: var(--code-bg); border-radius: 8px;
+  padding: 10px 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: baseline; overflow-x: auto;
+}
+.result .arrow { color: var(--muted); }
+.result .value { font-weight: 600; }
+.result .value.yes { color: var(--yes); }
+.result .value.no { color: var(--no); }
+.note { font-size: 0.9rem; color: var(--muted); max-width: 60ch; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+ul.out { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+ul.out li {
+  font-family: var(--font-mono); font-size: 0.95rem; background: var(--code-bg); border-left: 3px solid var(--accent);
+  border-radius: 0 6px 6px 0; padding: 6px 10px;
+}
+ul.out.tag-list li { animation: pop 0.3s ease both; }
+ul.out.tag-list li:nth-child(1) { animation-delay: 0s; }
+ul.out.tag-list li:nth-child(2) { animation-delay: 0.4s; }
+ul.out.tag-list li:nth-child(3) { animation-delay: 0.8s; }
+ul.out.tag-list li:nth-child(4) { animation-delay: 1.2s; }
+ul.out.tag-list li:nth-child(5) { animation-delay: 1.6s; }
+ul.out.tag-list li:nth-child(6) { animation-delay: 2.0s; }
+ul.out.tag-list li:nth-child(7) { animation-delay: 2.4s; }
+ul.out.tag-list li:nth-child(8) { animation-delay: 2.8s; }
+@keyframes pop { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { ul.out.tag-list li { animation: none; } }
+.status { font-size: 0.9rem; color: var(--fg); font-weight: 600; min-height: 1.4em; }
+.tip { border-top: 1px solid var(--line); padding-top: 14px; color: var(--muted); font-size: 0.9rem; max-width: 70ch; }
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="stack">
+    <p class="eyebrow">Lesson 21C · working session</p>
+    <h1>Loop, Check, Join</h1>
+    <p class="lede">Three tools for one array. Press the buttons, read the code next to each result, then change the array at the top and press them again.</p>
+  </header>
+
+  <section class="array-bar">
+    <label for="tags-input">The array every card below uses. Edit it (comma-separated) and everything re-runs.</label>
+    <div class="array-row">
+      <input type="text" id="tags-input" value="node, forms, fetch, git" size="34" aria-label="Array items, comma separated">
+    </div>
+    <pre id="tags-code" aria-live="polite"></pre>
+  </section>
+
+  <section class="card" aria-labelledby="h-loop">
+    <div class="card-head">
+      <span class="num">1 of 4</span>
+      <h2 id="h-loop"><code>for...of</code> — each one</h2>
+      <p class="note">Both loops below build the same list. One counts; one just takes each item.</p>
+    </div>
+    <div class="cols">
+      <div class="stack">
+        <span class="label">The loop you wrote in loadFeedback</span>
+        <pre id="code-counting"></pre>
+        <span class="label">The same loop with for...of</span>
+        <pre id="code-forof"></pre>
+      </div>
+      <div class="stack">
+        <div class="row">
+          <button type="button" id="run-counting">Run the counting loop</button>
+          <button type="button" class="primary" id="run-forof">Run for...of</button>
+          <button type="button" id="run-empty">Run for...of with []</button>
+        </div>
+        <ul class="out tag-list" id="tag-list" aria-live="polite"></ul>
+        <p class="status" id="loop-status" aria-live="polite"></p>
+        <p class="note">Gone: <code>i</code>, <code>tags.length</code>, <code>tags[i]</code>. Still here: <code>createElement</code>, <code>textContent</code>, <code>append</code>. The work is the same; only the counting left.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-includes">
+    <div class="card-head">
+      <span class="num">2 of 4</span>
+      <h2 id="h-includes"><code>.includes()</code> — is it there?</h2>
+      <p class="note">A question with a yes-or-no answer, which is why it fits inside an <code>if</code>. It compares the whole item, so capital letters and extra characters count.</p>
+    </div>
+    <div class="cols">
+      <div class="stack">
+        <span class="label">On an array: does it hold this item?</span>
+        <pre id="code-includes"></pre>
+        <span class="label">On a string: does it contain these characters?</span>
+        <pre id="code-string-includes"></pre>
+      </div>
+      <div class="stack">
+        <label class="label" for="word-input">Word to look for</label>
+        <div class="row">
+          <input type="text" id="word-input" value="forms" size="16">
+          <button type="button" data-word="forms">forms</button>
+          <button type="button" data-word="Forms">Forms</button>
+          <button type="button" data-word="form">form</button>
+        </div>
+        <div class="result" id="word-result" aria-live="polite"></div>
+        <label class="label" for="url-input">A request.url from your server</label>
+        <div class="row">
+          <input type="text" id="url-input" value="/feedback?rating=4" size="22">
+          <input type="text" id="needle-input" value="?" size="4" aria-label="Characters to look for in the url">
+        </div>
+        <div class="result" id="url-result" aria-live="polite"></div>
+        <p class="note">Your server asks <code>knownRoutes.includes(request.url)</code>. With <code>"/feedback?rating=4"</code> the whole-item comparison says <code>false</code>, so the 404 runs.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-join">
+    <div class="card-head">
+      <span class="num">3 of 4</span>
+      <h2 id="h-join"><code>.join()</code> — glue them into text</h2>
+      <p class="note">An array goes in, one string comes out. The argument is only the glue between items.</p>
+    </div>
+    <div class="cols">
+      <div class="stack">
+        <pre id="code-join"></pre>
+      </div>
+      <div class="stack">
+        <label class="label" for="glue-input">Glue</label>
+        <div class="row">
+          <input type="text" id="glue-input" value=", " size="8">
+          <button type="button" data-glue=", ">comma space</button>
+          <button type="button" data-glue="">nothing</button>
+          <button type="button" data-glue=" | ">bar</button>
+          <button type="button" data-glue=" and ">and</button>
+        </div>
+        <div class="result" id="join-result" aria-live="polite"></div>
+        <p class="status" id="join-type"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card" aria-labelledby="h-filter">
+    <div class="card-head">
+      <span class="num">4 of 4</span>
+      <h2 id="h-filter">All three in one function — a filter</h2>
+      <p class="note">This is the shape of Lesson 21 Project 1: <code>for...of</code> walks the list, <code>.includes()</code> decides, <code>.join()</code> writes the tags.</p>
+    </div>
+    <div class="cols">
+      <div class="stack">
+        <pre id="code-lessons"></pre>
+        <pre id="code-filter"></pre>
+      </div>
+      <div class="stack">
+        <label class="label" for="lesson-filter">Show lessons tagged</label>
+        <div class="row">
+          <select id="lesson-filter">
+            <option value="all">all</option>
+            <option value="html">html</option>
+            <option value="css">css</option>
+            <option value="js">js</option>
+            <option value="node">node</option>
+            <option value="forms">forms</option>
+          </select>
+        </div>
+        <p class="status" id="count-line" aria-live="polite"></p>
+        <ul class="out" id="lesson-list"></ul>
+      </div>
+    </div>
+  </section>
+
+  <p class="tip">Try it in the Console (F12): this page keeps the array in a variable named <code>tags</code>. Type <code>tags.includes("git")</code>, then <code>tags.join(" - ")</code>, then <code>for (const t of tags) console.log(t)</code>.</p>
+</div>
+
+<script>
+// Page elements
+const tagsInput = document.querySelector("#tags-input");
+const tagsCode = document.querySelector("#tags-code");
+const tagList = document.querySelector("#tag-list");
+const loopStatus = document.querySelector("#loop-status");
+const wordInput = document.querySelector("#word-input");
+const wordResult = document.querySelector("#word-result");
+const urlInput = document.querySelector("#url-input");
+const needleInput = document.querySelector("#needle-input");
+const urlResult = document.querySelector("#url-result");
+const glueInput = document.querySelector("#glue-input");
+const joinResult = document.querySelector("#join-result");
+const joinType = document.querySelector("#join-type");
+const lessonFilter = document.querySelector("#lesson-filter");
+const lessonList = document.querySelector("#lesson-list");
+const countLine = document.querySelector("#count-line");
+
+// The array every card uses. Also reachable from the Console.
+let tags = ["node", "forms", "fetch", "git"];
+
+// ---- 1. for...of ----------------------------------------------------
+function showEachTagCounting(tags) {
+  for (let i = 0; i < tags.length; i++) {
+    const item = document.createElement("li");
+    item.textContent = tags[i];
+    tagList.append(item);
+  }
+}
+
+function showEachTag(tags) {
+  for (const tag of tags) {
+    const item = document.createElement("li");
+    item.textContent = tag;
+    tagList.append(item);
+  }
+}
+
+// ---- 2. .includes() ----------------------------------------------------
+function isTagThere(tags, word) {
+  return tags.includes(word);
+}
+
+function hasCharacters(url, characters) {
+  return url.includes(characters);
+}
+
+// ---- 3. .join() ----------------------------------------------------
+function glueTags(tags, glue) {
+  return tags.join(glue);
+}
+
+// ---- 4. all three ----------------------------------------------------
+const lessons = [
+  { name: "Lesson 16 - Real form controls", tags: ["html", "forms"] },
+  { name: "Lesson 17 - Custom properties and states", tags: ["css"] },
+  { name: "Lesson 18 - Functions that return", tags: ["js"] },
+  { name: "Lesson 19 - Tables, grid, objects", tags: ["html", "css", "js"] },
+  { name: "Lesson 20 - Sending data to a server", tags: ["node", "forms", "js"] }
+];
+
+function showLessons(tag) {
+  lessonList.textContent = "";
+  let shown = 0;
+  for (const lesson of lessons) {
+    if (tag === "all" || lesson.tags.includes(tag)) {
+      const item = document.createElement("li");
+      item.textContent = lesson.name + " [" + lesson.tags.join(", ") + "]";
+      lessonList.append(item);
+      shown = shown + 1;
+    }
+  }
+  countLine.textContent = shown + " of " + lessons.length + " lessons shown";
+}
+
+// ---- plumbing: show the code above exactly as it runs ---------------
+document.querySelector("#code-counting").textContent = showEachTagCounting.toString();
+document.querySelector("#code-forof").textContent = showEachTag.toString();
+document.querySelector("#code-includes").textContent = isTagThere.toString();
+document.querySelector("#code-string-includes").textContent = hasCharacters.toString();
+document.querySelector("#code-join").textContent = glueTags.toString();
+document.querySelector("#code-lessons").textContent = "const lessons = [\n" + lessons.map(function (l) {
+  return '  { name: "' + l.name + '", tags: ["' + l.tags.join('", "') + '"] }';
+}).join(",\n") + "\n];";
+document.querySelector("#code-filter").textContent = showLessons.toString();
+
+function quote(text) { return '"' + text + '"'; }
+function arrayText(list) { return list.length === 0 ? "[]" : '["' + list.join('", "') + '"]'; }
+
+function setResult(el, codeText, value) {
+  el.textContent = "";
+  const code = document.createElement("span");
+  code.textContent = codeText;
+  const arrow = document.createElement("span");
+  arrow.className = "arrow";
+  arrow.textContent = "→";
+  const out = document.createElement("span");
+  out.className = "value";
+  if (typeof value === "boolean") {
+    out.textContent = String(value);
+    out.classList.add(value ? "yes" : "no");
+  } else {
+    out.textContent = quote(value);
+  }
+  el.append(code, arrow, out);
+}
+
+function readTags() {
+  const parts = tagsInput.value.split(",");
+  const clean = [];
+  for (const part of parts) {
+    const word = part.trim();
+    if (word !== "") { clean.push(word); }
+  }
+  tags = clean;
+  tagsCode.textContent = "const tags = " + arrayText(tags) + ";";
+}
+
+function runLoop(fn, list) {
+  tagList.textContent = "";
+  fn(list);
+  loopStatus.textContent = "The loop ran " + tagList.children.length + " time" + (tagList.children.length === 1 ? "" : "s") + ".";
+}
+
+function updateIncludes() {
+  const word = wordInput.value;
+  setResult(wordResult, "tags.includes(" + quote(word) + ")", isTagThere(tags, word));
+  const url = urlInput.value;
+  const needle = needleInput.value;
+  setResult(urlResult, quote(url) + ".includes(" + quote(needle) + ")", hasCharacters(url, needle));
+}
+
+function updateJoin() {
+  const glue = glueInput.value;
+  const text = glueTags(tags, glue);
+  setResult(joinResult, "tags.join(" + quote(glue) + ")", text);
+  joinType.textContent = "A string, " + text.length + " characters long.";
+}
+
+function updateAll() {
+  readTags();
+  runLoop(showEachTag, tags);
+  updateIncludes();
+  updateJoin();
+}
+
+tagsInput.addEventListener("input", updateAll);
+document.querySelector("#run-counting").addEventListener("click", function () { runLoop(showEachTagCounting, tags); });
+document.querySelector("#run-forof").addEventListener("click", function () { runLoop(showEachTag, tags); });
+document.querySelector("#run-empty").addEventListener("click", function () { runLoop(showEachTag, []); });
+wordInput.addEventListener("input", updateIncludes);
+urlInput.addEventListener("input", updateIncludes);
+needleInput.addEventListener("input", updateIncludes);
+for (const button of document.querySelectorAll("[data-word]")) {
+  button.addEventListener("click", function () { wordInput.value = button.dataset.word; updateIncludes(); });
+}
+glueInput.addEventListener("input", updateJoin);
+for (const button of document.querySelectorAll("[data-glue]")) {
+  button.addEventListener("click", function () { glueInput.value = button.dataset.glue; updateJoin(); });
+}
+lessonFilter.addEventListener("change", function () { showLessons(lessonFilter.value); });
+
+updateAll();
+showLessons("all");
+</script>
+</body>
+</html>
