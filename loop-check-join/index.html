@@ -106,17 +106,17 @@ ul.out li {
   font-family: var(--font-mono); font-size: 0.95rem; background: var(--code-bg); border-left: 3px solid var(--accent);
   border-radius: 0 6px 6px 0; padding: 6px 10px;
 }
-ul.out.name-list li { animation: pop 0.3s ease both; }
-ul.out.name-list li:nth-child(1) { animation-delay: 0s; }
-ul.out.name-list li:nth-child(2) { animation-delay: 0.4s; }
-ul.out.name-list li:nth-child(3) { animation-delay: 0.8s; }
-ul.out.name-list li:nth-child(4) { animation-delay: 1.2s; }
-ul.out.name-list li:nth-child(5) { animation-delay: 1.6s; }
-ul.out.name-list li:nth-child(6) { animation-delay: 2.0s; }
-ul.out.name-list li:nth-child(7) { animation-delay: 2.4s; }
-ul.out.name-list li:nth-child(8) { animation-delay: 2.8s; }
+ul.out.tag-list li { animation: pop 0.3s ease both; }
+ul.out.tag-list li:nth-child(1) { animation-delay: 0s; }
+ul.out.tag-list li:nth-child(2) { animation-delay: 0.4s; }
+ul.out.tag-list li:nth-child(3) { animation-delay: 0.8s; }
+ul.out.tag-list li:nth-child(4) { animation-delay: 1.2s; }
+ul.out.tag-list li:nth-child(5) { animation-delay: 1.6s; }
+ul.out.tag-list li:nth-child(6) { animation-delay: 2.0s; }
+ul.out.tag-list li:nth-child(7) { animation-delay: 2.4s; }
+ul.out.tag-list li:nth-child(8) { animation-delay: 2.8s; }
 @keyframes pop { from { opacity: 0; transform: translateX(-6px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { ul.out.name-list li { animation: none; } }
+@media (prefers-reduced-motion: reduce) { ul.out.tag-list li { animation: none; } }
 .status { font-size: 0.9rem; color: var(--fg); font-weight: 600; min-height: 1.4em; }
 .tip { border-top: 1px solid var(--line); padding-top: 14px; color: var(--muted); font-size: 0.9rem; max-width: 70ch; }
 </style>
@@ -130,11 +130,11 @@ ul.out.name-list li:nth-child(8) { animation-delay: 2.8s; }
   </header>
 
   <section class="array-bar">
-    <label for="names-input">The array every card below uses. Edit it (comma-separated) and everything re-runs.</label>
+    <label for="tags-input">The array every card below uses. Edit it (comma-separated) and everything re-runs.</label>
     <div class="array-row">
-      <input type="text" id="names-input" value="Alvarez, Chen, Legre, Okafor, Wells" size="40" aria-label="Array items, comma separated">
+      <input type="text" id="tags-input" value="Alvarez, Chen, Legre, Okafor, Wells" size="40" aria-label="Array items, comma separated">
     </div>
-    <pre id="names-code" aria-live="polite"></pre>
+    <pre id="tags-code" aria-live="polite"></pre>
   </section>
 
   <section class="card" aria-labelledby="h-loop">
@@ -156,9 +156,9 @@ ul.out.name-list li:nth-child(8) { animation-delay: 2.8s; }
           <button type="button" class="primary" id="run-forof">Run for...of</button>
           <button type="button" id="run-empty">Run for...of with []</button>
         </div>
-        <ul class="out name-list" id="name-list" aria-live="polite"></ul>
+        <ul class="out tag-list" id="tag-list" aria-live="polite"></ul>
         <p class="status" id="loop-status" aria-live="polite"></p>
-        <p class="note">Gone: <code>i</code>, <code>names.length</code>, <code>names[i]</code>. Still here: <code>createElement</code>, <code>textContent</code>, <code>append</code>. The work is the same; only the counting left.</p>
+        <p class="note">Gone: <code>i</code>, <code>tags.length</code>, <code>tags[i]</code>. Still here: <code>createElement</code>, <code>textContent</code>, <code>append</code>. The work is the same; only the counting left.</p>
       </div>
     </div>
   </section>
@@ -251,14 +251,14 @@ ul.out.name-list li:nth-child(8) { animation-delay: 2.8s; }
     </div>
   </section>
 
-  <p class="tip">Try it in the Console (F12): this page keeps the array in a variable named <code>names</code>. Type <code>names.includes("Wells")</code>, then <code>names.join(" - ")</code>, then <code>for (const n of names) console.log(n)</code>.</p>
+  <p class="tip">Try it in the Console (F12): this page keeps the array in a variable named <code>tags</code>. Type <code>tags.includes("Wells")</code>, then <code>tags.join(" - ")</code>, then <code>for (const t of tags) console.log(t)</code>.</p>
 </div>
 
 <script>
 // Page elements
-const namesInput = document.querySelector("#names-input");
-const namesCode = document.querySelector("#names-code");
-const nameList = document.querySelector("#name-list");
+const tagsInput = document.querySelector("#tags-input");
+const tagsCode = document.querySelector("#tags-code");
+const tagList = document.querySelector("#tag-list");
 const loopStatus = document.querySelector("#loop-status");
 const wordInput = document.querySelector("#word-input");
 const wordResult = document.querySelector("#word-result");
@@ -273,28 +273,28 @@ const lessonList = document.querySelector("#lesson-list");
 const countLine = document.querySelector("#count-line");
 
 // The array every card uses. Also reachable from the Console.
-let names = ["Alvarez", "Chen", "Legre", "Okafor", "Wells"];
+let tags = ["Alvarez", "Chen", "Legre", "Okafor", "Wells"];
 
 // ---- 1. for...of ----------------------------------------------------
-function showEachNameCounting(names) {
-  for (let i = 0; i < names.length; i++) {
+function showEachTagCounting(tags) {
+  for (let i = 0; i < tags.length; i++) {
     const item = document.createElement("li");
-    item.textContent = names[i];
-    nameList.append(item);
+    item.textContent = tags[i];
+    tagList.append(item);
   }
 }
 
-function showEachName(names) {
-  for (const name of names) {
+function showEachTag(tags) {
+  for (const tag of tags) {
     const item = document.createElement("li");
-    item.textContent = name;
-    nameList.append(item);
+    item.textContent = tag;
+    tagList.append(item);
   }
 }
 
 // ---- 2. .includes() ----------------------------------------------------
-function isNameThere(names, word) {
-  return names.includes(word);
+function isTagThere(tags, word) {
+  return tags.includes(word);
 }
 
 function hasCharacters(url, characters) {
@@ -302,8 +302,8 @@ function hasCharacters(url, characters) {
 }
 
 // ---- 3. .join() ----------------------------------------------------
-function glueNames(names, glue) {
-  return names.join(glue);
+function glueTags(tags, glue) {
+  return tags.join(glue);
 }
 
 // ---- 4. all three ----------------------------------------------------
@@ -330,11 +330,11 @@ function showLessons(tag) {
 }
 
 // ---- plumbing: show the code above exactly as it runs ---------------
-document.querySelector("#code-counting").textContent = showEachNameCounting.toString();
-document.querySelector("#code-forof").textContent = showEachName.toString();
-document.querySelector("#code-includes").textContent = isNameThere.toString();
+document.querySelector("#code-counting").textContent = showEachTagCounting.toString();
+document.querySelector("#code-forof").textContent = showEachTag.toString();
+document.querySelector("#code-includes").textContent = isTagThere.toString();
 document.querySelector("#code-string-includes").textContent = hasCharacters.toString();
-document.querySelector("#code-join").textContent = glueNames.toString();
+document.querySelector("#code-join").textContent = glueTags.toString();
 document.querySelector("#code-lessons").textContent = "const lessons = [\n" + lessons.map(function (l) {
   return '  { name: "' + l.name + '", tags: ["' + l.tags.join('", "') + '"] }';
 }).join(",\n") + "\n];";
@@ -361,26 +361,26 @@ function setResult(el, codeText, value) {
   el.append(code, arrow, out);
 }
 
-function readNames() {
-  const parts = namesInput.value.split(",");
+function readTags() {
+  const parts = tagsInput.value.split(",");
   const clean = [];
   for (const part of parts) {
     const word = part.trim();
     if (word !== "") { clean.push(word); }
   }
-  names = clean;
-  namesCode.textContent = "const names = " + arrayText(names) + ";";
+  tags = clean;
+  tagsCode.textContent = "const tags = " + arrayText(tags) + ";";
 }
 
 function runLoop(fn, list) {
-  nameList.textContent = "";
+  tagList.textContent = "";
   fn(list);
-  loopStatus.textContent = "The loop ran " + nameList.children.length + " time" + (nameList.children.length === 1 ? "" : "s") + ".";
+  loopStatus.textContent = "The loop ran " + tagList.children.length + " time" + (tagList.children.length === 1 ? "" : "s") + ".";
 }
 
 function updateIncludes() {
   const word = wordInput.value;
-  setResult(wordResult, "names.includes(" + quote(word) + ")", isNameThere(names, word));
+  setResult(wordResult, "tags.includes(" + quote(word) + ")", isTagThere(tags, word));
   const url = urlInput.value;
   const needle = needleInput.value;
   setResult(urlResult, quote(url) + ".includes(" + quote(needle) + ")", hasCharacters(url, needle));
@@ -388,22 +388,22 @@ function updateIncludes() {
 
 function updateJoin() {
   const glue = glueInput.value;
-  const text = glueNames(names, glue);
-  setResult(joinResult, "names.join(" + quote(glue) + ")", text);
+  const text = glueTags(tags, glue);
+  setResult(joinResult, "tags.join(" + quote(glue) + ")", text);
   joinType.textContent = "A string, " + text.length + " characters long.";
 }
 
 function updateAll() {
-  readNames();
-  runLoop(showEachName, names);
+  readTags();
+  runLoop(showEachTag, tags);
   updateIncludes();
   updateJoin();
 }
 
-namesInput.addEventListener("input", updateAll);
-document.querySelector("#run-counting").addEventListener("click", function () { runLoop(showEachNameCounting, names); });
-document.querySelector("#run-forof").addEventListener("click", function () { runLoop(showEachName, names); });
-document.querySelector("#run-empty").addEventListener("click", function () { runLoop(showEachName, []); });
+tagsInput.addEventListener("input", updateAll);
+document.querySelector("#run-counting").addEventListener("click", function () { runLoop(showEachTagCounting, tags); });
+document.querySelector("#run-forof").addEventListener("click", function () { runLoop(showEachTag, tags); });
+document.querySelector("#run-empty").addEventListener("click", function () { runLoop(showEachTag, []); });
 wordInput.addEventListener("input", updateIncludes);
 urlInput.addEventListener("input", updateIncludes);
 needleInput.addEventListener("input", updateIncludes);
