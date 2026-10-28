@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Code559 Code Examples</title>
+  <meta name="description" content="Small, working demonstrations of one concept each. Open one, press the buttons, read the code next to the result.">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&family=IBM+Plex+Mono:wght@400;600&display=swap">
+  <style>
+    :root {
+      --bg: #F2F5F8; --surface: #FFFFFF; --fg: #1B2430; --muted: #5B6875; --line: #D5DDE5;
+      --accent: #1A6E8C; --accent-soft: #DCEBF1; --code-bg: #E9EEF3;
+      --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --font-mono: "IBM Plex Mono", Consolas, "Courier New", monospace;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #0F161D; --surface: #16212B; --fg: #E6EDF3; --muted: #9AA8B5; --line: #2A3845;
+              --accent: #6CC3E0; --accent-soft: #1E3A47; --code-bg: #1C2733; color-scheme: dark; }
+    }
+    body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+           padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 48px; }
+    .page { max-width: 760px; margin: 0 auto; display: grid; gap: 20px; }
+    h1 { font-size: 1.9rem; font-weight: 600; margin: 0; letter-spacing: -0.01em; }
+    .lede { color: var(--muted); max-width: 60ch; margin: 0; }
+    .eyebrow { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); font-weight: 600; margin: 0; }
+    ul.models { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+    ul.models li { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; display: grid; gap: 6px; }
+    ul.models a { color: var(--accent); font-weight: 600; font-size: 1.1rem; text-decoration: none; }
+    ul.models a:hover, ul.models a:focus-visible { text-decoration: underline; }
+    ul.models p { margin: 0; color: var(--muted); }
+    code { font-family: var(--font-mono); font-size: 0.9em; background: var(--code-bg); padding: 1px 5px; border-radius: 4px; }
+    .how { border-top: 1px solid var(--line); padding-top: 16px; color: var(--muted); font-size: 0.95rem; max-width: 65ch; }
+    .how code { white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <p class="eyebrow">Code559 · working models</p>
+      <h1>Code559 Code Examples</h1>
+      <p class="lede">Small, working demonstrations of one concept each. Open one, press the buttons, and read the code next to the result. The code on the page is the code that runs.</p>
+    </header>
+
+    <ul class="models">
+    </ul>
+
+    <p class="how">To add a model: make a folder named for it, put a self-contained <code>index.html</code> inside, and add it to this list. One folder, one concept.</p>
+  </div>
+</body>
+</html>
